@@ -182,6 +182,65 @@ const searchAllMatchingProduct = async (req, res) => {
   }
 };
 
+const getAllProductByFilters = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      title = null,
+      desc = null,
+      category = null,
+      minPrice = null,
+      maxPrice = null,
+      inStock = null,
+    } = req.query;
+
+    const options = {
+      limit: parseInt(limit),
+      skip: (page - 1) * limit,
+    };
+
+    const filter = {};
+
+    if (title) {
+      filter.title = title;
+    }
+
+    if (desc) {
+      filter.desc = desc;
+    }
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) {
+        filter.price.$gte = parseFloat(minPrice);
+      }
+      if (maxPrice) {
+        filter.price.$lte = parseFloat(maxPrice);
+      }
+    }
+
+    if (inStock !== null) {
+      filter.inStock = inStock === 'true'; // Convert string to boolean
+    }
+
+    let products = await Product.find(filter, null, options);
+
+    if (products.length === 0) {
+      return res.status(404).json("Products not found!");
+    }
+
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json(err.message || "Internal server error!");
+  }
+};
+
+
 module.exports = {
   addProduct,
   updateProduct,
@@ -189,4 +248,5 @@ module.exports = {
   getProduct,
   getAllProduct,
   searchAllMatchingProduct,
+  getAllProductByFilters
 };

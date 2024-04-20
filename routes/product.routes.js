@@ -7,6 +7,7 @@ const {
   getProduct,
   getAllProduct,
   searchAllMatchingProduct,
+  getAllProductByFilters
 } = require("../controllers/product.controller.js");
 // add
 router.post("/", verifyAndAdmin, addProduct);
@@ -22,6 +23,9 @@ router.get("/", getAllProduct);
 
 // searching all matching product
 router.get("/search", searchAllMatchingProduct);
+
+// searching all matching product
+router.get("/filter", getAllProductByFilters);
 
 // get a product
 router.get("/:productId", getProduct);
